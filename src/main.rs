@@ -1,4 +1,4 @@
-use std::thread;
+use std::{thread, fmt};
 use std::sync::mpsc::{self, Sender, Receiver};
 
 use eframe::egui;
@@ -12,6 +12,20 @@ fn main() {
         .expect("Unexpected Error");
 }
 
+#[derive(Clone, Copy, PartialEq)]
+enum Algorithm {
+    Sha256,
+    Sha512,
+}
+
+impl fmt::Display for Algorithm {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Algorithm::Sha256 => write!(f,"SHA-256"),
+            Algorithm::Sha512 => write!(f,"SHA-512"),
+        }
+    }
+}
 
 enum Message {
     Hex(String),
@@ -23,6 +37,8 @@ struct MultProgram {
     hex:String,
     hash:String,
     thread_active:bool,
+    alg:Algorithm,
+
     tx:Sender<String>,
     rx:Receiver<Message>
 
@@ -51,6 +67,7 @@ impl MultProgram {
             input: "".to_owned(),
             hex: "".to_owned(),
             hash: "".to_owned(),
+            alg: Algorithm::Sha256,
         }
     }
 }
@@ -68,6 +85,14 @@ impl eframe::App for MultProgram {
                     Err(_) => (), 
                 }
             }
+
+            egui::ComboBox::from_label("Hashing Algorithm")
+                .selected_text(format!("{}", &self.alg))
+                .show_ui(ui, |ui| {
+                    ui.selectable_value(&mut self.alg, Algorithm::Sha256, "SHA-256");
+                    ui.selectable_value(&mut self.alg, Algorithm::Sha512, "SHA-512");
+
+            });
 
             ui.group(|ui| {
                 egui::Grid::new("stuff").show(ui, |ui| {
