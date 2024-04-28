@@ -15,9 +15,9 @@ pub fn print_word_string(v:&Vec<u64>, split:bool) -> String {
     let m : u64 = 1 << 32;  
     for i in v.iter() {
         if split {
-            res += &format!("{:x?} {:x?} ", i/m, i%m);
+            res += &format!("{:08x?} {:08x?} ", i/m, i%m);
         } else {
-            res += &format!("{:x?}", i);
+            res += &format!("{:016x?} ", i);
         }
         
     }

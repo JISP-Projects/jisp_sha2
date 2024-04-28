@@ -6,7 +6,7 @@ use jisp_sha2 as sha;
 
 fn main() {
     let native_options = eframe::NativeOptions::default();
-    let _ = eframe::run_native("Concurrent App", native_options, Box::new(|cc| Box::new(MultProgram::new(cc))))
+    let _ = eframe::run_native("SHA-2", native_options, Box::new(|cc| Box::new(MultProgram::new(cc))))
         .expect("Unexpected Error");
 }
 
@@ -31,7 +31,7 @@ impl MultProgram {
             let rx:Receiver<String> = rx1;
             for s in rx.iter() {
                 let i = sha::parser::sha256_preprocessing(&s);
-                let res = sha::printer::print_blocks(&i,true);
+                let res = sha::printer::print_blocks(&i,false);
                 tx.send(res).unwrap();
             }
         });
@@ -46,41 +46,13 @@ impl MultProgram {
     }
 }
 
-fn computation(i:i32) -> i32 {
-    std::thread::sleep(std::time::Duration::from_secs(5));
-    i*5
-}
-
-
 impl eframe::App for MultProgram {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
-            ui.group(|ui| {
-                egui::Grid::new("unimportant").show(ui, |ui| {
-                    ui.label("Sequentual calculation:");
-                    ui.end_row();
-                    ui.add_sized((320., 20.), egui::TextEdit::singleline(&mut self.input1).hint_text("Input Numbers..."));
-
-                    if ui.button("Submit").clicked() {
-                        match self.input1.trim().parse::<i32>() {
-                            Ok(i) => {
-                                self.output1 = format!("Answer: [ {} ]",computation(i).to_string());
-                            }
-                            Err(_) => self.output1 = "[Input a valid integer]".to_owned(),
-                        }  
-                    }
-                    ui.end_row();
-                    ui.add_space(20.);
-                    ui.end_row();
-                    ui.horizontal_centered(|ui| ui.add(egui::Label::new(&self.output1).selectable(true)));
-                });
-                
-            });
-
             if self.thread_active {
                 match self.rx.try_recv() {
-                    Ok(i) => {
-                        self.output2 = format!("Answer: [ {} ]", i);
+                    Ok(s) => {
+                        self.output2 = s;
                         self.thread_active = false;
                     },
                     Err(_) => (), 
@@ -88,19 +60,23 @@ impl eframe::App for MultProgram {
             }
 
             ui.group(|ui| {
-                egui::Grid::new("stuff").spacing((10.,20.)).show(ui, |ui| {
-                    ui.label("Parallel calculation:");
-                    ui.end_row();
-                    ui.add_sized((320., 20.), egui::TextEdit::singleline(&mut self.input2).hint_text("Input Numbers..."));
+                egui::Grid::new("stuff").show(ui, |ui| {
+                    ui.label("[IN]:");
+                    ui.add_sized((500., 20.), egui::TextEdit::singleline(&mut self.input2).hint_text("Input Text..."));
                     if ui.button("Submit").clicked() && !self.thread_active {
                         self.tx.send(self.input2.trim().to_owned()).unwrap();
                         self.thread_active = true;
                         self.output2 = "[Loading...]".to_owned();
                     }
                     ui.end_row();
-                    ui.add_space(20.);
                     ui.end_row();
-                    ui.horizontal_centered(|ui| ui.add(egui::Label::new(&self.output2).selectable(true)));
+                    ui.label("[OUT]:"); 
+                    ui.with_layout(egui::Layout::left_to_right(egui::Align::Center), |ui| {
+
+                        //ui.style_mut().visuals.override_text_color = Some(egui::Color32::WHITE);
+                        ui.add(egui::Label::new(&self.output2).selectable(true).wrap(true));
+                    })
+                    
                 });
                 
             })
