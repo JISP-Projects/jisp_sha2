@@ -2,10 +2,12 @@ use std::thread;
 use std::sync::mpsc::{self, Sender, Receiver};
 
 use eframe::egui;
+use eframe::epaint::FontId;
 use jisp_sha2 as sha;
 
 fn main() {
-    let native_options = eframe::NativeOptions::default();
+    let mut native_options = eframe::NativeOptions::default();
+    let _ = native_options.viewport.inner_size.insert((660., 480.).into());
     let _ = eframe::run_native("SHA-2", native_options, Box::new(|cc| Box::new(MultProgram::new(cc))))
         .expect("Unexpected Error");
 }
@@ -31,7 +33,7 @@ impl MultProgram {
             let rx:Receiver<String> = rx1;
             for s in rx.iter() {
                 let i = sha::parser::sha256_preprocessing(&s);
-                let res = sha::printer::print_blocks(&i,false);
+                let res = sha::printer::print_blocks(&i,true);
                 tx.send(res).unwrap();
             }
         });
@@ -62,7 +64,7 @@ impl eframe::App for MultProgram {
             ui.group(|ui| {
                 egui::Grid::new("stuff").show(ui, |ui| {
                     ui.label("[IN]:");
-                    ui.add_sized((500., 20.), egui::TextEdit::singleline(&mut self.input2).hint_text("Input Text..."));
+                    ui.add_sized((520., 20.), egui::TextEdit::singleline(&mut self.input2).hint_text("Input Text..."));
                     if ui.button("Submit").clicked() && !self.thread_active {
                         self.tx.send(self.input2.trim().to_owned()).unwrap();
                         self.thread_active = true;
@@ -74,6 +76,7 @@ impl eframe::App for MultProgram {
                     ui.with_layout(egui::Layout::left_to_right(egui::Align::Center), |ui| {
 
                         //ui.style_mut().visuals.override_text_color = Some(egui::Color32::WHITE);
+                        ui.style_mut().override_font_id = Some(FontId::monospace(12.));
                         ui.add(egui::Label::new(&self.output2).selectable(true).wrap(true));
                     })
                     
