@@ -39,9 +39,20 @@ struct MultProgram {
     thread_active:bool,
     alg:Algorithm,
 
-    tx:Sender<String>,
+    tx:Sender<(Algorithm, String)>,
     rx:Receiver<Message>
 
+}
+
+fn hashing_thread(tx:Sender<Message>, rx:Receiver<(Algorithm, String)>) {
+    for (a, s) in rx.iter() {
+        let i = sha::parser::sha256_preprocessing(&s);
+        let hex_text = sha::printer::print_blocks(&i,true);
+        tx.send(Message::Hex(hex_text)).unwrap();
+        let hash = sha::sha256::sha_256(i);
+        let hash_text = sha::printer::print_blocks(&vec![hash],true);
+        tx.send(Message::Hash(hash_text)).unwrap();
+    }
 }
 
 impl MultProgram {
@@ -49,18 +60,7 @@ impl MultProgram {
         cc.egui_ctx.set_visuals(egui::Visuals::dark());
         let (tx1, rx1) = mpsc::channel();
         let (tx2, rx2) = mpsc::channel::<Message>();
-        thread::spawn(move|| {
-            let tx:Sender<Message> = tx2;
-            let rx:Receiver<String> = rx1;
-            for s in rx.iter() {
-                let i = sha::parser::sha256_preprocessing(&s);
-                let hex_text = sha::printer::print_blocks(&i,true);
-                tx.send(Message::Hex(hex_text)).unwrap();
-                let hash = sha::sha256::sha_256(i);
-                let hash_text = sha::printer::print_blocks(&vec![hash],true);
-                tx.send(Message::Hash(hash_text)).unwrap();
-            }
-        });
+        thread::spawn(move|| hashing_thread(tx2, rx1));
         Self {
             tx: tx1, rx: rx2,
             thread_active:false,
@@ -86,7 +86,7 @@ impl eframe::App for MultProgram {
                 }
             }
 
-            egui::ComboBox::from_label("Hashing Algorithm")
+            egui::ComboBox::from_label("")
                 .selected_text(format!("{}", &self.alg))
                 .show_ui(ui, |ui| {
                     ui.selectable_value(&mut self.alg, Algorithm::Sha256, "SHA-256");
@@ -99,7 +99,8 @@ impl eframe::App for MultProgram {
                     ui.label("[IN]:");
                     ui.add_sized((520., 20.), egui::TextEdit::singleline(&mut self.input).hint_text("Input Text..."));
                     if ui.button("Submit").clicked() && !self.thread_active {
-                        self.tx.send(self.input.trim().to_owned()).unwrap();
+                        let s = self.input.trim().to_owned();
+                        self.tx.send((self.alg, s)).unwrap();
                         self.thread_active = true;
                         self.hex = "[Loading...]".to_owned();
                         self.hash = "[Loading...]".to_owned();
