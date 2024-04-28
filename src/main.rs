@@ -4,6 +4,7 @@ use std::sync::mpsc::{self, Sender, Receiver};
 use eframe::egui;
 use eframe::epaint::FontId;
 use jisp_sha2 as sha;
+use sha::printer::print_blocks;
 
 fn main() {
     let mut native_options = eframe::NativeOptions::default();
@@ -47,10 +48,11 @@ struct MultProgram {
 fn hashing_thread(tx:Sender<Message>, rx:Receiver<(Algorithm, String)>) {
     for (a, s) in rx.iter() {
         let i = sha::parser::sha256_preprocessing(&s);
-        let hex_text = sha::printer::print_blocks(&i,true);
+        let hex_text = print_blocks(&i,true);
         tx.send(Message::Hex(hex_text)).unwrap();
+        
         let hash = sha::sha256::sha_256(i);
-        let hash_text = sha::printer::print_blocks(&vec![hash],true);
+        let hash_text = print_blocks(&vec![hash],true);
         tx.send(Message::Hash(hash_text)).unwrap();
     }
 }

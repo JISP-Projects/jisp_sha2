@@ -23,3 +23,25 @@ impl super::Constants<64, u32> for Sha256Constants {
         ];
     }
 }
+
+pub struct Sha224Constants;
+
+impl super::Constants<64, u32> for Sha224Constants {
+    fn constant_words() -> [u32; 64] {
+        Sha256Constants::constant_words()
+    }
+
+    fn initial_hash() -> [u32; 8] {
+        return [
+            0xc1059ed8, 
+            0x367cd507, 
+            0x3070dd17, 
+            0xf70e5939, 
+            0xffc00b31, 
+            0x68581511, 
+            0x64f98fa7,
+            0xbefa4fa4
+        ];
+    }
+}
+
