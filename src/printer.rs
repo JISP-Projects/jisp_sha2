@@ -1,8 +1,8 @@
-use crypto_bigint::U512;
+use crypto_bigint::{U512, Uint};
 use crate::conversions::to_u64_words;
 
 
-pub fn print_blocks(v: &Vec<U512>, split:bool) -> String {
+pub fn print_blocks<const BLOCK:usize>(v: &Vec<Uint<BLOCK>>, split:bool) -> String {
     let mut res = "".to_owned();
     for n in v {
         let words = to_u64_words(*n);
