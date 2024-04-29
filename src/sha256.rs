@@ -2,11 +2,21 @@ use std::ops::{BitXor, BitAnd};
 
 use crypto_bigint::{U512,U256};
 use crate::conversions;
-use crate::constants::{Constants, Sha256};
+use crate::constants::{Constants, Sha256, Sha224};
 
 
 pub fn sha_256(m:Vec<U512>) -> U256 {
     sha256_internal::<Sha256>(m)
+}
+
+pub fn sha_224(m:Vec<U512>) -> [u32;7] {
+    let hash = sha256_internal::<Sha224>(m);
+    let words = conversions::to_u32_words(hash);
+    let mut truncated_words = [0u32; 7];
+    for i in 0..7 {
+        truncated_words[i] = words[i];
+    } 
+    return truncated_words;
 }
 
 
