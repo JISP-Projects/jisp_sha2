@@ -53,7 +53,7 @@ fn hashing_thread(tx:Sender<Message>, rx:Receiver<(Algorithm, String)>) {
     for (a, s) in rx.iter() {
         match a {
             Algorithm::Sha256 => {
-                let i = sha::parser::sha256_preprocessing(&s);
+                let i = sha::preprocessing::sha256_preprocessing(&s);
                 let hex_text = print_blocks(&i,true);
                 tx.send(Message::Hex(hex_text)).unwrap();
         
@@ -63,7 +63,7 @@ fn hashing_thread(tx:Sender<Message>, rx:Receiver<(Algorithm, String)>) {
             },
 
             Algorithm::Sha224 => {
-                let i = sha::parser::sha256_preprocessing(&s);
+                let i = sha::preprocessing::sha256_preprocessing(&s);
                 let hex_text = print_blocks(&i,true);
                 tx.send(Message::Hex(hex_text)).unwrap();
         
@@ -73,7 +73,7 @@ fn hashing_thread(tx:Sender<Message>, rx:Receiver<(Algorithm, String)>) {
             }
 
             Algorithm::Sha512 => {
-                let i = sha::parser::sha512_preprocessing(&s);
+                let i = sha::preprocessing::sha512_preprocessing(&s);
                 let hex_text = print_blocks(&i,true);
                 tx.send(Message::Hex(hex_text)).unwrap();
         
@@ -84,7 +84,7 @@ fn hashing_thread(tx:Sender<Message>, rx:Receiver<(Algorithm, String)>) {
 
             Algorithm::Sha384 => {
                 //same preprocessing as sha512 with slightly different algorithm
-                let i = sha::parser::sha512_preprocessing(&s);
+                let i = sha::preprocessing::sha512_preprocessing(&s);
                 let hex_text = print_blocks(&i,true);
                 tx.send(Message::Hex(hex_text)).unwrap();
         
