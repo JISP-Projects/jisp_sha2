@@ -23,3 +23,11 @@ pub fn print_word_string(v:&Vec<u64>, split:bool) -> String {
     }
     res
 }
+
+pub fn print_u32_word_string(v:&Vec<u32>) -> String {
+    let mut res = "".to_owned();
+    for i in v.iter() {
+        res += &format!("{:08x?} ", i);
+    }
+    res
+}

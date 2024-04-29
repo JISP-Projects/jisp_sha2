@@ -4,7 +4,7 @@ use std::sync::mpsc::{self, Sender, Receiver};
 use eframe::egui;
 use eframe::epaint::FontId;
 use jisp_sha2 as sha;
-use sha::printer::print_blocks;
+use sha::printer::{print_blocks, print_u32_word_string};
 
 fn main() {
     let mut native_options = eframe::NativeOptions::default();
@@ -16,7 +16,9 @@ fn main() {
 #[derive(Clone, Copy, PartialEq)]
 enum Algorithm {
     Sha256,
+    Sha224,
     Sha512,
+    Sha384
 }
 
 impl fmt::Display for Algorithm {
@@ -24,6 +26,8 @@ impl fmt::Display for Algorithm {
         match self {
             Algorithm::Sha256 => write!(f,"SHA-256"),
             Algorithm::Sha512 => write!(f,"SHA-512"),
+            Algorithm::Sha224 => write!(f, "SHA-224"),
+            Algorithm::Sha384 => write!(f, "SHA-384")
         }
     }
 }
@@ -57,6 +61,17 @@ fn hashing_thread(tx:Sender<Message>, rx:Receiver<(Algorithm, String)>) {
                 let hash_text = print_blocks(&vec![hash],true);
                 tx.send(Message::Hash(hash_text)).unwrap();
             },
+
+            Algorithm::Sha224 => {
+                let i = sha::parser::sha256_preprocessing(&s);
+                let hex_text = print_blocks(&i,true);
+                tx.send(Message::Hex(hex_text)).unwrap();
+        
+                let hash = sha::sha256::sha_224(i);
+                let hash_text = print_u32_word_string(&hash.to_vec());
+                tx.send(Message::Hash(hash_text)).unwrap();
+            }
+
             Algorithm::Sha512 => {
                 let i = sha::parser::sha512_preprocessing(&s);
                 let hex_text = print_blocks(&i,true);
@@ -65,7 +80,18 @@ fn hashing_thread(tx:Sender<Message>, rx:Receiver<(Algorithm, String)>) {
                 let hash = sha::sha512::sha_512(i);
                 let hash_text = print_blocks(&vec![hash],true);
                 tx.send(Message::Hash(hash_text)).unwrap();
-            }
+            },
+
+            Algorithm::Sha384 => {
+                //same preprocessing as sha512 with slightly different algorithm
+                let i = sha::parser::sha512_preprocessing(&s);
+                let hex_text = print_blocks(&i,true);
+                tx.send(Message::Hex(hex_text)).unwrap();
+        
+                let hash = sha::sha512::sha_384(i);
+                let hash_text = print_blocks(&vec![hash],true);
+                tx.send(Message::Hash(hash_text)).unwrap();
+            },
         }
         
     }
@@ -105,8 +131,11 @@ impl eframe::App for MultProgram {
             egui::ComboBox::from_label("")
                 .selected_text(format!("{}", &self.alg))
                 .show_ui(ui, |ui| {
-                    ui.selectable_value(&mut self.alg, Algorithm::Sha256, "SHA-256");
                     ui.selectable_value(&mut self.alg, Algorithm::Sha512, "SHA-512");
+                    ui.selectable_value(&mut self.alg, Algorithm::Sha384, "SHA-384");
+                    ui.selectable_value(&mut self.alg, Algorithm::Sha256, "SHA-256");
+                    ui.selectable_value(&mut self.alg, Algorithm::Sha224, "SHA-224");
+                    
 
             });
 
