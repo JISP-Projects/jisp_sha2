@@ -1,10 +1,6 @@
-[package]
-name = "jisp_sha2"
-version = "0.1.0"
-edition = "2021"
+[workspace]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
-crypto-bigint = "0.5.5"
-eframe = "0.27.2"
+members = [
+    "jisp_sha2",
+    "jisp_sha2_gui"
+]
