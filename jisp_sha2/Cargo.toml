@@ -1,9 +1,10 @@
 [package]
 name = "jisp_sha2"
-version = "0.2.2"
+version = "0.2.3"
 edition = "2021"
 description = "an implementation of the SHA-2 algorithm and its variations for a personal project"
 license = "MIT"
+repository = "https://github.com/JISP-Projects/jisp_sha2"
 readme = "../README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
