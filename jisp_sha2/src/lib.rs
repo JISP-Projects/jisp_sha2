@@ -32,6 +32,10 @@ pub mod preprocessing;
 pub use preprocessing::sha256_preprocessing;
 pub use preprocessing::sha512_preprocessing;
 pub use preprocessing::custom_preprocessing;
+pub use sha256::sha_256;
+pub use sha256::sha_224;
+pub use sha512::sha_512;
+pub use sha512::sha_384;
 
 pub mod conversions;
 pub mod printer;
