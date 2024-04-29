@@ -35,7 +35,6 @@ pub fn preprocessing<const BLOCK: usize, const SUFFIX: usize>(s: &str) -> Vec<Ui
 ///
 /// let res = word_padding::<8,1>(&v, [len]);
 /// let expected = U512::ONE.shl(448).checked_add(&U512::from(8u8)).unwrap();
-/// println!("{:?}",res);
 ///
 /// assert_eq!(res, vec![expected])
 /// ```
