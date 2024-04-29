@@ -17,8 +17,8 @@ in the directory. Alternatively you can also use `cargo build` and then run the 
 In order to use this crate in your own rust projects you need to add the following to your `Cargo.toml` file
 ```
 [dependencies]
-jisp_sha2 = "0.1.0"
+jisp_sha2 = "0.2.0"
 ```
 
 # Documentation
-Look at the [docs.rs](https://docs.rs/jisp_sha2/0.1.0) to learn more about how to use this project!
+Look at the [docs.rs](https://docs.rs/jisp_sha2/0.2.0) to learn more about how to use this project!

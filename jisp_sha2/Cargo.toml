@@ -1,6 +1,6 @@
 [package]
 name = "jisp_sha2"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 description = "an implementation of the SHA-2 algorithm and its variations for a personal project"
 license = "MIT"
