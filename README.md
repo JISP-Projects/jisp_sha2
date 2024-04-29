@@ -21,4 +21,4 @@ jisp_sha2 = "0.1.0"
 ```
 
 # Documentation
-Look at the [docs.rs](docs.rs/jisp_sha2/0.1.0) to learn more about how to use this project!
+Look at the [docs.rs](https://docs.rs/jisp_sha2/0.1.0) to learn more about how to use this project!
