@@ -47,13 +47,27 @@ struct MultProgram {
 
 fn hashing_thread(tx:Sender<Message>, rx:Receiver<(Algorithm, String)>) {
     for (a, s) in rx.iter() {
-        let i = sha::parser::sha256_preprocessing(&s);
-        let hex_text = print_blocks(&i,true);
-        tx.send(Message::Hex(hex_text)).unwrap();
+        match a {
+            Algorithm::Sha256 => {
+                let i = sha::parser::sha256_preprocessing(&s);
+                let hex_text = print_blocks(&i,true);
+                tx.send(Message::Hex(hex_text)).unwrap();
         
-        let hash = sha::sha256::sha_256(i);
-        let hash_text = print_blocks(&vec![hash],true);
-        tx.send(Message::Hash(hash_text)).unwrap();
+                let hash = sha::sha256::sha_256(i);
+                let hash_text = print_blocks(&vec![hash],true);
+                tx.send(Message::Hash(hash_text)).unwrap();
+            },
+            Algorithm::Sha512 => {
+                let i = sha::parser::sha512_preprocessing(&s);
+                let hex_text = print_blocks(&i,true);
+                tx.send(Message::Hex(hex_text)).unwrap();
+        
+                let hash = sha::sha512::sha_512(i);
+                let hash_text = print_blocks(&vec![hash],true);
+                tx.send(Message::Hash(hash_text)).unwrap();
+            }
+        }
+        
     }
 }
 
