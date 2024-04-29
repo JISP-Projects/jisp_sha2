@@ -1,14 +1,19 @@
+//! This is the SHA-512 Algorithm. 
+//! You can use the standard implementations of [sha_512] and [sha_384] or you can use custom constants and initial hash values with [sha512_internal]
+
 use std::ops::{BitXor, BitAnd};
 
 use crypto_bigint::{U384, U512,U1024};
 use crate::conversions::{self, to_u64_words};
 use crate::constants::{Constants, Sha512, Sha384};
 
-
+/// The SHA-512 Algorithm, only use this after having [preprocessed](crate::preprocessing::sha512_preprocessing) your data into message blocks
 pub fn sha_512(m:Vec<U1024>) -> U512 {
     sha512_internal::<Sha512>(m)
 }
 
+/// The SHA-384 Algorithm, only use this after having [preprocessed](crate::preprocessing::sha512_preprocessing) your data into message blocks
+/// Note that this is essentially the [SHA-512](sha_512) algorithm, except with different constants and a truncated result.
 pub fn sha_384(m:Vec<U1024>) -> U384 {
     let res = sha512_internal::<Sha384>(m);
     let words = to_u64_words(res);
@@ -19,7 +24,9 @@ pub fn sha_384(m:Vec<U1024>) -> U384 {
     return conversions::from_u64_words(&mut truncated_words);
 }
 
-fn sha512_internal<C:Constants<80,u64>>(msg:Vec<U1024>) -> U512 {
+/// The internal loop of the SHA-512 algorithm, 
+/// you can use different initial hash and constant values by implementing the [Constants](crate::constants::Constants) trait on a new object
+pub fn sha512_internal<C:Constants<80,u64>>(msg:Vec<U1024>) -> U512 {
     let mut hash = C::initial_hash();
     for block in msg {
         let registers = sha512_compression::<C>(&hash, block);
@@ -28,7 +35,6 @@ fn sha512_internal<C:Constants<80,u64>>(msg:Vec<U1024>) -> U512 {
         }
     }
     conversions::from_u64_words(&mut hash)
-    
 }
 
 fn sha512_compression<C:Constants<80,u64>>(intermediate_hash:&[u64;8], msg:U1024) -> [u64;8] {

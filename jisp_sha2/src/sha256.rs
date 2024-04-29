@@ -1,3 +1,7 @@
+//! This is the SHA-256 Algorithm. 
+//! You can use the standard implementations of [sha_256] and [sha_224] or you can use custom constants and initial hash values with [sha256_internal]
+
+
 use std::ops::{BitXor, BitAnd};
 
 use crypto_bigint::{U512,U256};
@@ -5,10 +9,13 @@ use crate::conversions;
 use crate::constants::{Constants, Sha256, Sha224};
 
 
+/// The SHA-256 Algorithm, only use this after having [preprocessed](crate::preprocessing::sha256_preprocessing) your data into message blocks
 pub fn sha_256(m:Vec<U512>) -> U256 {
     sha256_internal::<Sha256>(m)
 }
 
+/// The SHA-224 Algorithm, only use this after having [preprocessed](crate::preprocessing::sha256_preprocessing) your data into message blocks
+/// Note that this is essentially the [SHA-256](sha_256) algorithm, except with different constants and a truncated result.
 pub fn sha_224(m:Vec<U512>) -> [u32;7] {
     let hash = sha256_internal::<Sha224>(m);
     let words = conversions::to_u32_words(hash);
@@ -20,7 +27,9 @@ pub fn sha_224(m:Vec<U512>) -> [u32;7] {
 }
 
 
-fn sha256_internal<C:Constants<64,u32>>(msg:Vec<U512>) -> U256 {
+/// The internal loop of the SHA-256 algorithm, 
+/// you can use different initial hash and constant values by implementing the [Constants](crate::constants::Constants) trait on a new object
+pub fn sha256_internal<C:Constants<64,u32>>(msg:Vec<U512>) -> U256 {
     let mut hash = C::initial_hash();
     for block in msg {
         let registers = sha256_compression::<C>(&hash, block);

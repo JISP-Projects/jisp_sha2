@@ -1,4 +1,7 @@
+//! Some functions to transform [Uint](crypto_bigint::Uint) integers into and from lists of `u32` and `u64` integers.
 use crypto_bigint::Uint;
+
+
 
 /// Takes an array of words and transforms it into a big integer. Resets the array to all 0s in the process
 /// # Examples
