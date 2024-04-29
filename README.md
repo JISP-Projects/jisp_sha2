@@ -4,7 +4,7 @@ This crate is my implementation of SHA-2, this implementation is just my persona
 
 # Running the simple GUI
 For demonstration purposes I have also made a simple User Interface
-<img src="images/SHA-256" width="100%">
+<img src="images/SHA-256.png" width="100%">
 
 If you want to use this interface yourself you need to have the rust compiler [Cargo](https://www.rust-lang.org/tools/install) installed.
 
