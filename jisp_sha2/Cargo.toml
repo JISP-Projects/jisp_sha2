@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 description = "an implementation of the SHA-2 algorithm and its variations for a personal project"
 license = "MIT"
+readme = "../README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
