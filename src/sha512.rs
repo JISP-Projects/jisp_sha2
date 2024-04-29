@@ -1,14 +1,23 @@
 use std::ops::{BitXor, BitAnd};
 
-use crypto_bigint::{U512,U1024};
-use crate::conversions;
-use crate::constants::{Constants, Sha512};
+use crypto_bigint::{U384, U512,U1024};
+use crate::conversions::{self, to_u64_words};
+use crate::constants::{Constants, Sha512, Sha384};
 
 
 pub fn sha_512(m:Vec<U1024>) -> U512 {
     sha512_internal::<Sha512>(m)
 }
 
+pub fn sha_384(m:Vec<U1024>) -> U384 {
+    let res = sha512_internal::<Sha384>(m);
+    let words = to_u64_words(res);
+    let mut truncated_words = [0u64; 6];
+    for i in 0..6 {
+        truncated_words[i] = words[i];
+    } 
+    return conversions::from_u64_words(&mut truncated_words);
+}
 
 fn sha512_internal<C:Constants<80,u64>>(msg:Vec<U1024>) -> U512 {
     let mut hash = C::initial_hash();
@@ -135,7 +144,7 @@ mod tests {
     #[test]
     fn simple_sigma_l0() {
         let y = sigma_l0(1);
-        let expected = (1 << 36) + (1 << 30) + (1 << 27);
+        let expected = (1 << 36) + (1 << 30) + (1 << 25);
         assert_eq!(y, expected);
     }
 
