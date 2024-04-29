@@ -1,3 +1,5 @@
+//! Functions for performing the standard preprocessing steps before applying the SHA-2 algorithm
+
 use crypto_bigint::{Uint, U1024, U512};
 use crate::conversions;
 
@@ -6,14 +8,14 @@ pub fn string_to_encoding(s: &str) -> Vec<u8> {
 }
 
 pub fn sha256_preprocessing(s: &str) -> Vec<U512> {
-    preprocessing::<8, 1>(s)
+    standard_preprocessing::<8, 1>(s)
 }
 
 pub fn sha512_preprocessing(s: &str) -> Vec<U1024> {
-    preprocessing::<16, 2>(s)
+    standard_preprocessing::<16, 2>(s)
 }
 
-pub fn preprocessing<const BLOCK: usize, const SUFFIX: usize>(s: &str) -> Vec<Uint<BLOCK>> {
+pub fn standard_preprocessing<const BLOCK: usize, const SUFFIX: usize>(s: &str) -> Vec<Uint<BLOCK>> {
     let bytes = string_to_encoding(s);
     let l = 8 * bytes.len();
     let mut l_vec = [0 as u64; SUFFIX];
@@ -23,11 +25,16 @@ pub fn preprocessing<const BLOCK: usize, const SUFFIX: usize>(s: &str) -> Vec<Ui
     word_padding(&words, l_vec)
 }
 
+pub fn custom_preprocessing<const BLOCK: usize, const SUFFIX: usize>(bytes: Vec<u8>, suffix:[u64;SUFFIX]) -> Vec<Uint<BLOCK>> {
+    let words = byte_padding(&bytes);
+    word_padding(&words, suffix)
+}
+
 /// Packs 64 bit words into 512 bit blocks by padding the message with 0s and adding the suffix l (usually the length of the message) at the end of the final block.
 /// # Examples
 /// The word padding function completely trusts you that the length you give was the original length of the message
 /// ```
-/// use jisp_sha2::parser::word_padding;
+/// use jisp_sha2::preprocessing::word_padding;
 /// use crypto_bigint::{U512, CheckedAdd};
 ///
 /// let v = vec![1];
@@ -81,7 +88,7 @@ pub fn word_padding<const BSIZE: usize, const SUFFIX: usize>(
 /// We extend the length of the list of bytes by adding a 1 bit at the end and enough 0s such that we have a multiple of 64 bits
 ///  # Example
 /// ```
-/// use jisp_sha2::parser::byte_padding;
+/// use jisp_sha2::preprocessing::byte_padding;
 ///
 /// let mut v = vec![1,2,3];
 ///
@@ -94,7 +101,7 @@ pub fn word_padding<const BSIZE: usize, const SUFFIX: usize>(
 ///
 /// the 1 packing at the end means we add an extra u64 if your message is already a multiple of 8 bytes
 /// ```
-/// use jisp_sha2::parser::byte_padding;
+/// use jisp_sha2::preprocessing::byte_padding;
 ///
 /// let mut v = vec![0;8];
 /// v[7] = 5;
