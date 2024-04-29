@@ -2,12 +2,12 @@
 
 This crate is my implementation of SHA-2, this implementation is just my personal project and has not been officially verified or audited and should therefore not be used in any real-world applications, it is only meant for small personal projects such as mine. 
 
-
 # Running the simple GUI
-For demonstration purposes I have made a simple User Interface
+For demonstration purposes I have also made a simple User Interface
 ![Simple User Interface](images/SHA-256.png)
-If you want to use this interface yourself you need to have [Cargo the rust compiler](https://www.rust-lang.org/tools/install) installed.
-You need to then clone this repository and run
+If you want to use this interface yourself you need to have the rust compiler [Cargo](https://www.rust-lang.org/tools/install) installed.
+
+To execute this program you need to then clone this repository and run
 ```
 cargo run -p jisp_sha2_gui
 ```
